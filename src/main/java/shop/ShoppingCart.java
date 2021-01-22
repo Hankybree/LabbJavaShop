@@ -1,5 +1,7 @@
 package shop;
 
+import shop.discounts.DiscountStrategy;
+
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -12,13 +14,7 @@ public class ShoppingCart {
 
     private final Set<ShoppingCartItem> items = new HashSet<>();
 
-    // Undostack
-    // Redostack
-
-    public void addCartItem(ShoppingCartItem item){
-
-        items.add(item);
-    }
+    public void addCartItem(ShoppingCartItem item){ items.add(item); }
 
     public Stream<ShoppingCartItem> stream(){
         return items.stream();
@@ -31,6 +27,10 @@ public class ShoppingCart {
             sum = item.itemCost().multiply(BigDecimal.valueOf(item.quantity())).add(sum);
         }
         return sum;
+    }
+
+    public BigDecimal calculatePriceWithDiscount(DiscountStrategy discount) {
+        return discount.calculatePrice(items, calculatePrice());
     }
 
     public void undo(){

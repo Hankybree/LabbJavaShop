@@ -2,6 +2,9 @@ package shop;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import shop.discounts.Buy3For2;
+import shop.discounts.Get10PercentOver500;
+import shop.discounts.GetCheapestForFree;
 
 import java.math.BigDecimal;
 
@@ -23,6 +26,30 @@ class ShopTest {
     void payingFullPrice() {
         assertThat(shoppingCart.stream().mapToInt(ShoppingCartItem::quantity).sum()).isEqualTo(6);
         assertThat(shoppingCart.calculatePrice()).isEqualTo(BigDecimal.valueOf(73.93));
+    }
+
+    @Test
+    void payWith3For2Discount() {
+        assertThat(shoppingCart.stream().mapToInt(ShoppingCartItem::quantity).sum()).isEqualTo(6);
+        assertThat(shoppingCart.calculatePriceWithDiscount(new Buy3For2())).isEqualTo(BigDecimal.valueOf(70.93));
+    }
+
+    @Test
+    void payWithCheapestFreeDiscount() {
+        assertThat(shoppingCart.stream().mapToInt(ShoppingCartItem::quantity).sum()).isEqualTo(6);
+        assertThat(shoppingCart.calculatePriceWithDiscount(new GetCheapestForFree())).isEqualTo(BigDecimal.valueOf(70.93));
+    }
+    @Test
+    void payWith10PercentOver500Discount() {
+        assertThat(shoppingCart.stream().mapToInt(ShoppingCartItem::quantity).sum()).isEqualTo(6);
+        assertThat(shoppingCart.calculatePriceWithDiscount(new Get10PercentOver500())).isEqualTo(BigDecimal.valueOf(73.93));
+    }
+
+    @Test
+    void payWith10PercentOver500DiscountMoreWares() {
+        shoppingCart.addCartItem(new ShoppingCartItem(new Product("Kalaspuffar"), 29.95, 20));
+        assertThat(shoppingCart.stream().mapToInt(ShoppingCartItem::quantity).sum()).isEqualTo(26);
+        assertThat(shoppingCart.calculatePriceWithDiscount(new Get10PercentOver500())).isEqualTo(BigDecimal.valueOf(605.637));
     }
 
     @Test
