@@ -21,6 +21,30 @@ class ShopTest {
         shoppingCart.addCartItem(new ShoppingCartItem(new Product("Butter"), 44.95, 1));
     }
 
+    @Test
+    void undoOnce() {
+        shoppingCart.undo();
+        assertThat(shoppingCart.stream().mapToInt(ShoppingCartItem::quantity).sum()).isEqualTo(5);
+        assertThat(shoppingCart.calculatePrice()).isEqualTo(BigDecimal.valueOf(28.98));
+    }
+
+    @Test
+    void undoTwice() {
+        shoppingCart.undo();
+        shoppingCart.undo();
+        assertThat(shoppingCart.stream().mapToInt(ShoppingCartItem::quantity).sum()).isEqualTo(2);
+        assertThat(shoppingCart.calculatePrice()).isEqualTo(BigDecimal.valueOf(19.98));
+    }
+
+    @Test
+    void undoTwiceThenRedo() {
+        shoppingCart.undo();
+        shoppingCart.undo();
+        shoppingCart.redo();
+        assertThat(shoppingCart.stream().mapToInt(ShoppingCartItem::quantity).sum()).isEqualTo(5);
+        assertThat(shoppingCart.calculatePrice()).isEqualTo(BigDecimal.valueOf(28.98));
+    }
+
 
     @Test
     void payingFullPrice() {

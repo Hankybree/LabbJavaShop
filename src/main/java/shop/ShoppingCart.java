@@ -1,20 +1,29 @@
 package shop;
 
+import shop.commands.AddToCart;
+import shop.commands.Command;
 import shop.discounts.DiscountStrategy;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ShoppingCart {
 
+    private Stack<Command> undoStack = new Stack<>();
+    private Stack<Command> redoStack = new Stack<>();
+
     private final Set<ShoppingCartItem> items = new HashSet<>();
 
-    public void addCartItem(ShoppingCartItem item){ items.add(item); }
+    public Set<ShoppingCartItem> getItems() { return items; }
+
+    public void addCartItem(ShoppingCartItem item){
+        redoStack.clear();
+        AddToCart addToCart = new AddToCart(items, item);
+        addToCart.execute();
+        undoStack.push(addToCart);
+    }
 
     public Stream<ShoppingCartItem> stream(){
         return items.stream();
@@ -34,12 +43,13 @@ public class ShoppingCart {
     }
 
     public void undo(){
-        //Undo the latest change to the ShoppingCart
+        redoStack.push(undoStack.lastElement());
+        undoStack.pop().unExecute();
     }
 
 
     public void redo(){
-        //Redo the latest change to the ShoppingCart
+        redoStack.pop().execute();
     }
 
     public String receipt() {
